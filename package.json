@@ -1,0 +1,33 @@
+{
+  "name": "digestify-markdown-assets",
+  "description": "Generate digest, update markdown files and upload assets to S3",
+  "main": "index.js",
+  "homepage": "https://github.com/fewlines/digestify-markdown-assets",
+  "license": "MIT",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "jest",
+    "prettify": "prettier --write '**/*.js'"
+  },
+  "devDependencies": {
+    "jest": "^21.2.1",
+    "prettier": "^1.8.1"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.148.0",
+    "glob": "^7.1.2",
+    "md5-file": "^3.2.3",
+    "yargs": "^10.0.3"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "singleQuote": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fewlines/digestify-markdown-assets.git"
+  },
+  "bin": {
+    "digestify": "index.js"
+  }
+}

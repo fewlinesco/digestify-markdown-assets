@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:latest
+        environment:
+          GNUPGHOME: "$HOME/.asdf/keyrings/nodejs"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: sed -ire '/NVM_DIR/d' ~/.bashrc
+      - run: echo 'export PATH=$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH' >> $BASH_ENV
+      - restore_cache:
+          keys:
+            - v1-language-deps-{{ checksum ".tool-versions" }}
+      - run: if ! asdf --version; then git clone https://github.com/asdf-vm/asdf.git ~/.asdf; fi
+      - run: if ! asdf plugin-list | grep nodejs; then asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git; fi
+      - run: mkdir -p "$GNUPGHOME" && chmod 0700 "$GNUPGHOME"
+      - run: if ! ls $GNUPGHOME/* &> /dev/null; then bash $HOME/.asdf/plugins/nodejs/bin/import-release-team-keyring; fi
+      - run: asdf install
+      - save_cache:
+          key: v1-language-deps-{{ checksum ".tool-versions" }}
+          paths:
+            - ~/.asdf
+      - run: npm install
+      - run: npm run test
+      - run: npx prettier --list-different '*.js' '**/*.js'
