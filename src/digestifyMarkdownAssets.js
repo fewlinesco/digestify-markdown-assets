@@ -41,7 +41,7 @@ const writeManifest = manifest =>
   new Promise((resolve, reject) =>
     fs.writeFile(
       'manifest.json',
-      JSON.stringify(manifest),
+      JSON.stringify(manifest, null, 2),
       error => (error ? reject(`Can not write the manifest.json : ${error}`) : resolve(manifest))
     )
   );
