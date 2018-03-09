@@ -18,7 +18,7 @@ const uploadAssets = (bucket, manifest) => {
   return Promise.all(Object.keys(manifest).map(uploadAsset));
 };
 
-const updateMarkdowns = (CDN, manifest) => {
+const updateMarkdowns = (CDN, ignorePattern, manifest) => {
   const updateMarkdown = markdownPath =>
     readFile(markdownPath, 'utf8').then(content => {
       const newContent = markdown.updateLinks({ path: markdownPath, content: content }, manifest, CDN);
@@ -32,7 +32,7 @@ const updateMarkdowns = (CDN, manifest) => {
       );
     });
 
-  return glob('**/*.md', { nocase: true })
+  return glob('**/*.md', { nocase: true, ignore: ignorePattern ? ignorePattern : undefined })
     .then(paths => Promise.all(paths.map(updateMarkdown)))
     .then(() => manifest);
 };
@@ -54,7 +54,7 @@ const digestifyMarkdownAssets = commandLineArguments => {
   glob(pattern, { nocase: true })
     .then(manifest.fromPaths)
     .then(writeManifest)
-    .then(manifest => updateMarkdowns(commandLineArguments.cdnUrl, manifest))
+    .then(manifest => updateMarkdowns(commandLineArguments.cdnUrl, commandLineArguments.ignore, manifest))
     .then(manifest => uploadAssets(commandLineArguments.bucket, manifest))
     .then(() => console.log('Manifest generated, Markdown updated, Assets uploaded.'))
     .catch(console.error);
