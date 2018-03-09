@@ -18,7 +18,7 @@ const uploadAssets = (bucket, manifest) => {
   return Promise.all(Object.keys(manifest).map(uploadAsset));
 };
 
-const updateMarkdowns = (CDN, ignorePattern, manifest) => {
+const updateMarkdowns = (CDN, customIgnorePattern, manifest) => {
   const updateMarkdown = markdownPath =>
     readFile(markdownPath, 'utf8').then(content => {
       const newContent = markdown.updateLinks({ path: markdownPath, content: content }, manifest, CDN);
@@ -32,7 +32,14 @@ const updateMarkdowns = (CDN, ignorePattern, manifest) => {
       );
     });
 
-  return glob('**/*.md', { nocase: true, ignore: ignorePattern ? ignorePattern : undefined })
+  let ignorePattern = ['node_modules/**'];
+  if (customIgnorePattern && typeof customIgnorePattern === 'string') {
+    ignorePattern = [...ignorePattern, customIgnorePattern];
+  } else if (customIgnorePattern) {
+    ignorePattern = [...ignorePattern, ...customIgnorePattern];
+  }
+
+  return glob('**/*.md', { nocase: true, ignore: ignorePattern })
     .then(paths => Promise.all(paths.map(updateMarkdown)))
     .then(() => manifest);
 };
@@ -51,7 +58,7 @@ const digestifyMarkdownAssets = commandLineArguments => {
 
   const pattern = commandLineArguments.pattern ? commandLineArguments.pattern : imagesPattern;
 
-  glob(pattern, { nocase: true })
+  glob(pattern, { nocase: true, ignore: ['node_modules/**'] })
     .then(manifest.fromPaths)
     .then(writeManifest)
     .then(manifest => updateMarkdowns(commandLineArguments.cdnUrl, commandLineArguments.ignore, manifest))

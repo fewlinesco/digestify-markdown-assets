@@ -24,7 +24,7 @@ module.exports = {
     });
 
     yargs.positional('ignore', {
-      describe: 'Glob pattern matchingfiles that will not be updated',
+      describe: 'Glob pattern matching files that will not be updated (node_modules will always be ignored)',
       default: null
     });
 
