@@ -23,6 +23,11 @@ module.exports = {
       default: true
     });
 
+    yargs.positional('ignore', {
+      describe: 'Glob pattern matching files that will not be updated (node_modules will always be ignored)',
+      default: null
+    });
+
     yargs.positional('cdn-url', {
       describe: 'CDN URL used in the Markdown to get the assets'
     });
